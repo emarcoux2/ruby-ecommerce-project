@@ -1,4 +1,24 @@
 Rails.application.routes.draw do
+  get "transactions/index"
+  get "transactions/show"
+  get "order_products/index"
+  get "order_products/show"
+  get "orders/index"
+  get "orders/show"
+  get "payment_methods/index"
+  get "payment_methods/show"
+  get "addresses/index"
+  get "addresses/show"
+  get "customers/index"
+  get "customers/show"
+  get "carts/index"
+  get "carts/show"
+  get "cart_products/index"
+  get "cart_products/show"
+  get "products/index"
+  get "products/show"
+  get "categories/index"
+  get "categories/show"
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   get "up" => "rails/health#show", as: :rails_health_check
