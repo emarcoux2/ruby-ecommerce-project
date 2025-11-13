@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer: one
+  street: MyString
+  city: MyString
+  province: MyString
+  postal_code: MyString
+  is_primary: false
+
+two:
+  customer: two
+  street: MyString
+  city: MyString
+  province: MyString
+  postal_code: MyString
+  is_primary: false
