@@ -4,7 +4,7 @@ require "securerandom"
 require "fileutils"
 require "set"
 
-MAX_PRODUCTS = 5000
+MAX_PRODUCTS = 4000
 total_count = 0
 
 CartProduct.destroy_all
@@ -95,8 +95,17 @@ CATEGORIES.each do |category_name|
       next if p["product_name"].nil? || p["product_name"].strip.empty?
       next if existing_names.include?(p["product_name"])
 
-      is_active_value = [ true, true, true, false ].sample || true
+      is_active_value = [true, true, true, false].sample || true
       unit_value      = p["quantity"].to_s.strip.presence || "1 item"
+
+      image_url =
+        p["image_front_url"] ||
+        p["image_url"] ||
+        p["image_small_url"] ||
+        p["image_thumb_url"] ||
+        nil
+
+      next if image_url.nil?
 
       begin
         product = Product.create!(
@@ -107,7 +116,8 @@ CATEGORIES.each do |category_name|
           unit:        unit_value,
           price:       Faker::Commerce.price(range: 1.0..20.0, as_string: false),
           sku:         p["code"] || SecureRandom.hex(6),
-          is_active:   is_active_value
+          is_active:   is_active_value,
+          image_url: image_url
         )
 
         total_count += 1
