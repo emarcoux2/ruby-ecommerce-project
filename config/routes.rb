@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  root to: "home#index"
+
+  resources :products, only: %i[ index show ]
+  resources :categories, only: %i[ index show ]
+  resources :cart_products, only: %i[ index show ]
+
   get "transactions/index"
   get "transactions/show"
   get "order_products/index"

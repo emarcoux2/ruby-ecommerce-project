@@ -18,6 +18,56 @@ PaymentMethod.destroy_all
 Customer.destroy_all
 Category.destroy_all
 
+puts "Seeding customers..."
+
+CUSTOMER_COUNT = 500
+customers = []
+
+CUSTOMER_COUNT.times do
+  customers << Customer.create!(
+    name:          Faker::Name.name,
+    email_address: Faker::Internet.unique.email,
+    phone_number:  Faker::PhoneNumber.phone_number,
+    password_hash: Faker::Internet.password(
+      min_length: 8,
+      max_length: 20,
+      mix_case: true,
+      special_characters: true
+    )
+  )
+end
+
+puts "Seeding addresses..."
+
+PROVINCES = %w[
+  AB BC MB NB NL NS NT NU ON PE QC SK YT
+]
+
+customers.each do |customer|
+  address_count = rand(1..3)
+
+  created_addresses = address_count.times.map do
+    Address.create!(
+      customer:    customer,
+      street:      Faker::Address.street_address,
+      city:        Faker::Address.city,
+      postal_code: Faker::Address.postcode,
+      province:    PROVINCES.sample,
+      is_primary:  false
+    )
+  end
+
+  # updating one of a customer's addresses to true
+  # to set it as the primary address
+  primary = created_addresses.sample
+  primary.update!(is_primary: true)
+
+  puts "Customer #{customer.name} has #{address_count} addresses (#{primary.id} is primary)"
+end
+
+puts "Created #{customers.size} customers"
+
+puts "Seeding categories..."
 CATEGORIES = %w[
   Produce
   Bakery
@@ -34,6 +84,7 @@ categories = {}
 CATEGORIES.each do |name|
   categories[name] = Category.create!(name: name)
 end
+puts "Categories seeded!"
 
 SEARCH_TERMS = {
   "Produce"   => [ "apple", "banana", "carrot", "lettuce", "tomato", "cucumber", "strawberry", "grapes", "onion", "pepper" ],
@@ -79,6 +130,8 @@ def fetch_openfoodfacts_products(term, limit: 50)
   end
 end
 
+puts "Seeding products (up to #{MAX_PRODUCTS})..."
+
 existing_names = Product.pluck(:name).to_set
 
 CATEGORIES.each do |category_name|
@@ -95,7 +148,7 @@ CATEGORIES.each do |category_name|
       next if p["product_name"].nil? || p["product_name"].strip.empty?
       next if existing_names.include?(p["product_name"])
 
-      is_active_value = [true, true, true, false].sample || true
+      is_active_value = [ true, true, true, false ].sample || true
       unit_value      = p["quantity"].to_s.strip.presence || "1 item"
 
       image_url =
@@ -117,19 +170,20 @@ CATEGORIES.each do |category_name|
           price:       Faker::Commerce.price(range: 1.0..20.0, as_string: false),
           sku:         p["code"] || SecureRandom.hex(6),
           is_active:   is_active_value,
-          image_url: image_url
+          image_url:   image_url
         )
 
         total_count += 1
         added_count += 1
         existing_names.add(p["product_name"])
-        puts "Created: #{product.name} ($#{product.price}) in #{category.name}"
+        puts "✅ Created: #{product.name} ($#{product.price}) in #{category.name}"
       rescue ActiveRecord::RecordInvalid => e
-        puts "Skipped '#{p['product_name']}' due to validation error: #{e.message}"
+        puts "⚠ Skipped '#{p['product_name']}' due to validation error: #{e.message}"
       end
     end
   end
 
+  puts "Finished #{category_name}: #{added_count} products added"
   break if total_count >= MAX_PRODUCTS
 end
 
