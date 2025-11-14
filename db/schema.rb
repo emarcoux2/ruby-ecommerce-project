@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_14_061911) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_14_075518) do
+  create_table "abouts", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "active_admin_comments", force: :cascade do |t|
     t.integer "author_id"
     t.string "author_type"
