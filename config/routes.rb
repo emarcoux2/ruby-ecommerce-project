@@ -1,4 +1,12 @@
 Rails.application.routes.draw do
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+
+  namespace :admin do
+    resources :products
+    resources :customers
+  end
+
   root to: "home#index"
 
   resources :products, only: %i[ index show ]
@@ -25,7 +33,5 @@ Rails.application.routes.draw do
   get "products/show"
   get "categories/index"
   get "categories/show"
-  devise_for :admin_users, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
   get "up" => "rails/health#show", as: :rails_health_check
 end
