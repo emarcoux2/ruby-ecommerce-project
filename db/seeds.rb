@@ -4,7 +4,7 @@ require "securerandom"
 require "fileutils"
 require "set"
 
-MAX_PRODUCTS = 2000
+MAX_PRODUCTS = 5000
 total_count = 0
 
 CartProduct.destroy_all
