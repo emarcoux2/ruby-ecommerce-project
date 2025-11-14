@@ -176,4 +176,35 @@ CATEGORIES.each do |category_name|
   break if total_count >= MAX_PRODUCTS
 end
 
+Page.find_or_create_by!(page_type: "about") do |page|
+  page.title   = "About Pantry"
+  page.content = <<~CONTENT
+    Welcome to Pantry, your friendly neighbourhood grocery store! We’re a small,
+    local business dedicated to bringing fresh, high-quality products to our community.
+    From fresh produce and bakery delights to pantry essentials and snacks, we carefully
+    select every item to ensure you have the best choices for your family. At Pantry, we
+    believe shopping should be convenient, enjoyable, and personal. Our team is always here
+    to help, whether it’s finding the perfect ingredient for your recipe or sharing tips for healthy living.
+    Thank you for supporting a local business—Pantry wouldn't be where it is today without the love and support from our community.
+    Stop by and experience the difference of a store that truly cares about its customers!
+  CONTENT
+end
+
+Page.find_or_create_by!(page_type: "contact") do |page|
+  page.title = "Contact Us"
+  page.content = <<~CONTENT
+    We’d love to hear from you! Whether you have questions, feedback, or just want to say hello, our team at Pantry is here to help.
+
+    Contact Information:
+    Address: 123 This Street, That City, That Province, H4H 4H4
+    Phone: (505) 123-4567
+    Email: pantry@grocery.com
+
+    Business Hours:
+    Monday – Friday: 8:00 AM – 10:00 PM
+    Saturday: 9:00 AM – 9:00 PM
+    Sunday: 10:00 AM – 6:00 PM
+  CONTENT
+end
+
 AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
