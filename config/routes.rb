@@ -29,9 +29,11 @@ Rails.application.routes.draw do
   get "carts/show"
   get "cart_products/index"
   get "cart_products/show"
-  get "products/index"
-  get "products/show"
   get "categories/index"
   get "categories/show"
+
+  get "/about",   to: "pages#show", page_type: "about"
+  get "/contact", to: "pages#show", page_type: "contact"
+
   get "up" => "rails/health#show", as: :rails_health_check
 end
