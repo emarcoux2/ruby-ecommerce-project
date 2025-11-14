@@ -1,0 +1,14 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-menu is-active is-flex is-justify-content-center">
+    <ul class="navbar-item" style="display: flex; gap: 1.5rem; list-style: none;">
+
+      <%# Home link only displays if the page is not the home page %>
+      <% unless controller_name == "home" %>
+        <li><%= link_to "Home", root_path, class: "navbar-link" %></li>
+      <% end %>
+      <li><%= link_to "Products", products_path, class: "navbar-link" %></li>
+      <li><%= link_to "Orders", orders_show_path, class: "navbar-link" %></li>
+      <li><%= link_to "About", about_path, class: "navbar-link" %></li>
+    </ul>
+  </div>
+</nav>

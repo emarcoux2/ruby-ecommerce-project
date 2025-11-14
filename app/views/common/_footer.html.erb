@@ -1,0 +1,15 @@
+<footer class="footer py-5">
+  <div class="container has-text-centered">
+    <ul class="is-inline-flex is-justify-content-center is-align-items-center mb-3" style="list-style: none; padding: 0; gap: 1.5rem;">
+      <% unless controller_name == "home" %>
+        <li><%= link_to "Home", root_path %></li>
+      <% end %>
+      <li><%= link_to "Account", customers_show_path %></li>
+      <li><%= link_to "Orders", orders_show_path %></li>
+      <li><%= link_to "Contact Us", contact_path %></li>
+      <li><%= link_to "About Us", about_path %></li>
+    </ul>
+
+    <p class="has-text-grey">Oppositewrong © 2025</p>
+  </div>
+</footer>
