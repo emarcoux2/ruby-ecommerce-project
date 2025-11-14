@@ -7,6 +7,37 @@ require "set"
 MAX_PRODUCTS = 4000
 total_count = 0
 
+CUSTOMER_COUNT = 500
+customers = []
+
+PROVINCES = %w[
+  AB BC MB NB NL NS NT NU ON PE QC SK YT
+]
+
+CATEGORIES = %w[
+  Produce
+  Bakery
+  Dairy
+  Meat
+  Frozen
+  Pantry
+  Beverages
+  Snacks
+  Household
+]
+
+SEARCH_TERMS = {
+  "Produce"   => [ "apple", "banana", "carrot", "lettuce", "tomato", "cucumber", "strawberry", "grapes", "onion", "pepper" ],
+  "Bakery"    => [ "bread", "croissant", "bagel", "muffin", "brioche", "baguette", "donut", "cake", "rolls", "pretzel" ],
+  "Dairy"     => [ "milk", "cheese", "yogurt", "butter", "cream", "cottage cheese", "ice cream", "cheddar", "feta", "kefir" ],
+  "Meat"      => [ "chicken", "beef", "ham", "pork", "bacon", "sausage", "turkey", "salami", "ground beef", "lamb" ],
+  "Frozen"    => [ "frozen pizza", "ice cream", "frozen veggies", "frozen berries", "frozen meals", "frozen fish", "frozen fries", "frozen desserts", "frozen dumplings", "frozen nuggets" ],
+  "Pantry"    => [ "pasta", "rice", "beans", "canned tuna", "lentils", "cereal", "oats", "flour", "sugar", "canned tomatoes" ],
+  "Beverages" => [ "juice", "soda", "coffee", "tea", "energy drink", "sparkling water", "milkshake", "smoothie", "beer", "wine" ],
+  "Snacks"    => [ "chips", "chocolate", "cookies", "nuts", "granola bar", "popcorn", "pretzels", "candy", "crackers", "trail mix" ],
+  "Household" => [ "dish soap", "laundry detergent", "paper towels", "toilet paper", "cleaning wipes", "sponges", "trash bags", "bleach", "fabric softener", "all-purpose cleaner" ]
+}
+
 CartProduct.destroy_all
 OrderProduct.destroy_all
 Transaction.destroy_all
@@ -17,11 +48,6 @@ Address.destroy_all
 PaymentMethod.destroy_all
 Customer.destroy_all
 Category.destroy_all
-
-puts "Seeding customers..."
-
-CUSTOMER_COUNT = 500
-customers = []
 
 CUSTOMER_COUNT.times do
   customers << Customer.create!(
@@ -36,12 +62,6 @@ CUSTOMER_COUNT.times do
     )
   )
 end
-
-puts "Seeding addresses..."
-
-PROVINCES = %w[
-  AB BC MB NB NL NS NT NU ON PE QC SK YT
-]
 
 customers.each do |customer|
   address_count = rand(1..3)
@@ -61,42 +81,12 @@ customers.each do |customer|
   # to set it as the primary address
   primary = created_addresses.sample
   primary.update!(is_primary: true)
-
-  puts "Customer #{customer.name} has #{address_count} addresses (#{primary.id} is primary)"
 end
-
-puts "Created #{customers.size} customers"
-
-puts "Seeding categories..."
-CATEGORIES = %w[
-  Produce
-  Bakery
-  Dairy
-  Meat
-  Frozen
-  Pantry
-  Beverages
-  Snacks
-  Household
-]
 
 categories = {}
 CATEGORIES.each do |name|
   categories[name] = Category.create!(name: name)
 end
-puts "Categories seeded!"
-
-SEARCH_TERMS = {
-  "Produce"   => [ "apple", "banana", "carrot", "lettuce", "tomato", "cucumber", "strawberry", "grapes", "onion", "pepper" ],
-  "Bakery"    => [ "bread", "croissant", "bagel", "muffin", "brioche", "baguette", "donut", "cake", "rolls", "pretzel" ],
-  "Dairy"     => [ "milk", "cheese", "yogurt", "butter", "cream", "cottage cheese", "ice cream", "cheddar", "feta", "kefir" ],
-  "Meat"      => [ "chicken", "beef", "ham", "pork", "bacon", "sausage", "turkey", "salami", "ground beef", "lamb" ],
-  "Frozen"    => [ "frozen pizza", "ice cream", "frozen veggies", "frozen berries", "frozen meals", "frozen fish", "frozen fries", "frozen desserts", "frozen dumplings", "frozen nuggets" ],
-  "Pantry"    => [ "pasta", "rice", "beans", "canned tuna", "lentils", "cereal", "oats", "flour", "sugar", "canned tomatoes" ],
-  "Beverages" => [ "juice", "soda", "coffee", "tea", "energy drink", "sparkling water", "milkshake", "smoothie", "beer", "wine" ],
-  "Snacks"    => [ "chips", "chocolate", "cookies", "nuts", "granola bar", "popcorn", "pretzels", "candy", "crackers", "trail mix" ],
-  "Household" => [ "dish soap", "laundry detergent", "paper towels", "toilet paper", "cleaning wipes", "sponges", "trash bags", "bleach", "fabric softener", "all-purpose cleaner" ]
-}
 
 # saves JSON responses to prevent repeated API calls during seeding
 CACHE_DIR = Rails.root.join("tmp", "open_food_facts_cache")
@@ -129,8 +119,6 @@ def fetch_openfoodfacts_products(term, limit: 50)
     []
   end
 end
-
-puts "Seeding products (up to #{MAX_PRODUCTS})..."
 
 existing_names = Product.pluck(:name).to_set
 
@@ -176,9 +164,10 @@ CATEGORIES.each do |category_name|
         total_count += 1
         added_count += 1
         existing_names.add(p["product_name"])
-        puts "✅ Created: #{product.name} ($#{product.price}) in #{category.name}"
+
+        puts "Created: #{product.name} ($#{product.price}) in #{category.name}"
       rescue ActiveRecord::RecordInvalid => e
-        puts "⚠ Skipped '#{p['product_name']}' due to validation error: #{e.message}"
+        puts "Skipped '#{p['product_name']}' due to validation error: #{e.message}"
       end
     end
   end
@@ -187,4 +176,4 @@ CATEGORIES.each do |category_name|
   break if total_count >= MAX_PRODUCTS
 end
 
-# AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
+AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
