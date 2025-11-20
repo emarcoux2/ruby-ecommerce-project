@@ -13,6 +13,10 @@ Rails.application.routes.draw do
   resources :categories, only: %i[ index show ]
   resources :cart_products, only: %i[ index show ]
 
+  post "cart", to: "carts#add", as: "cart_add"
+  delete "cart", to: "carts#destroy", as: "cart_destroy"
+  put "cart", to: "carts#quantity", as: "cart_quantity"
+
   get "transactions/index"
   get "transactions/show"
   get "order_products/index"
