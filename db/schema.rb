@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_17_162416) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_21_061732) do
   create_table "abouts", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -90,10 +90,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_17_162416) do
   create_table "customers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address"
+    t.string "encrypted_password", default: "", null: false
     t.string "name"
     t.string "password_hash"
     t.string "phone_number"
+    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
     t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_customers_on_email_address", unique: true
+    t.index ["reset_password_token"], name: "index_customers_on_reset_password_token", unique: true
   end
 
   create_table "order_products", force: :cascade do |t|
