@@ -14,7 +14,7 @@
     <div class="columns is-multiline">
       <% @featured_products.each do |product| %>
         <div class="column is-one-quarter">
-          <%= render partial: "products/product", locals: { product: product } %>
+          <%= render partial: "products/product", locals: { product: product, show_name: true } %>
         </div>
       <% end %>
     </div>

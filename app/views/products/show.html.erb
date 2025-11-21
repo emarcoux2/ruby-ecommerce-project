@@ -2,7 +2,7 @@
   <div class="container">
     <div class="columns is-vcentered">
       <div class="column is-half">
-        <%= render partial: "products/product", locals: { product: @product } %>
+        <%= render partial: "products/product", locals: { product: @product, show_name: false } %>
         <h1 class="title is-2"><%= @product.name %></h1>
         <p class="subtitle is-4 has-text-success">
           <%= number_to_currency(@product.price) %>

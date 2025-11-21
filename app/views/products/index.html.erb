@@ -35,7 +35,7 @@
 <div class="columns is-multiline">
   <% @products.each do |product| %>
     <div class="column is-one-quarter">
-      <%= render partial: "product", locals: { product: product } %>
+      <%= render partial: "product", locals: { product: product, show_name: true } %>
     </div>
   <% end %>
 </div>

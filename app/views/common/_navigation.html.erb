@@ -9,6 +9,9 @@
       <li><%= link_to "Products", products_path, class: "navbar-link" %></li>
       <li><%= link_to "Orders", orders_show_path, class: "navbar-link" %></li>
       <li><%= link_to "About", about_path, class: "navbar-link" %></li>
+      <div class="navbar-end">
+        <%= link_to "🛒 Cart (#{@cart_count})", cart_path, class: "navbar-item" %>
+      </div>
     </ul>
   </div>
 </nav>
