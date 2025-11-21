@@ -14,17 +14,7 @@
     <div class="columns is-multiline">
       <% @featured_products.each do |product| %>
         <div class="column is-one-quarter">
-          <%= link_to product_path(product), class: "card", style: "display:block; color:inherit;" do %>
-            <div class="card-image">
-              <figure class="image is-4by3">
-                <img src="<%= product.image_url %>" alt="<%= product.name %>">
-              </figure>
-            </div>
-            <div class="card-content">
-              <p class="title is-5"><%= product.name %></p>
-              <p class="subtitle is-6"><%= number_to_currency(product.price) %></p>
-            </div>
-          <% end %>
+          <%= render partial: "products/product", locals: { product: product } %>
         </div>
       <% end %>
     </div>
