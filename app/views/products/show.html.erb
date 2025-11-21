@@ -17,6 +17,9 @@
           <p><%= @product.description %></p>
         </div>
         <p class="is-size-6 has-text-grey">
+          <strong>Category:</strong> <%= @product.category&.name || "Uncategorized" %>
+        </p>
+        <p class="is-size-6 has-text-grey">
           <strong>SKU:</strong> <%= @product.sku %>
         </p>
         <p class="is-size-6 has-text-grey">
