@@ -4,7 +4,7 @@
 <% resource_name ||= :customer %>
 
 <%= form_for(resource, as: resource_name, url: customer_registration_path, html: { method: :post }) do |f| %>
-  <%= render "customers/shared/error_messages", resource: resource %>
+  <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
     <%= f.label :name %><br />
@@ -18,7 +18,7 @@
 
   <div class="field">
     <%= f.label :email_address, "Email" %><br />
-    <%= f.email_field :email_address, autofocus: true, autocomplete: "email" %>
+    <%= f.email_field :email_address, autocomplete: "email" %>
   </div>
 
   <div class="field">
@@ -39,4 +39,4 @@
   </div>
 <% end %>
 
-<%= render "customers/shared/links" %>
+<%= render "devise/shared/links" %>
