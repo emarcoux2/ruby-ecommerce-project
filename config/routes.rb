@@ -7,7 +7,7 @@ Rails.application.routes.draw do
     resources :customers
   end
 
-  root to: "home#index"
+  root to: "pages#home"
 
   resources :products, only: %i[ index show ]
   resources :categories, only: %i[ index show ]
