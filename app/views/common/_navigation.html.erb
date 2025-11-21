@@ -10,9 +10,18 @@
       <li><%= link_to "About", about_path, class: "navbar-link" %></li>
     </ul>
 
-    <div class="navbar-end" style="margin-left: auto;">
+    <div class="navbar-end" style="margin-left: auto; display: flex; gap: 1rem;">
       <% cart_count = session[:cart]&.values&.sum || 0 %>
       <%= link_to "🛒 Cart (#{cart_count})", cart_path, class: "navbar-item" %>
+      <% if customer_signed_in? %>
+        <span class="navbar-item">Hello, <%= current_customer.name %>!</span>
+        <%= link_to "Account", edit_customer_registration_path, class: "navbar-item" %>
+        <%= link_to "Logout", destroy_customer_session_path,
+                              data: { turbo_method: :delete }, class: "navbar-item" %>
+      <% else %>
+        <%= link_to "Sign In", new_customer_session_path, class: "navbar-item" %>
+        <%= link_to "Sign Up", new_customer_registration_path, class: "navbar-item" %>
+      <% end %>
     </div>
   </div>
 </nav>
