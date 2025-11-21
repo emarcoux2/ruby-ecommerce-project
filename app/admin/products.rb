@@ -1,5 +1,5 @@
 ActiveAdmin.register Product do
-  permit_params :name, :quantity, :category_id, :price, :unit, :is_active, :image_url, :description, :sku
+  permit_params :name, :quantity, :category_id, :price, :unit, :is_active, :description, :sku, :image
 
   index do
     selectable_column
@@ -10,6 +10,13 @@ ActiveAdmin.register Product do
     column :quantity
     column :is_active
     column :created_at
+    column "Image" do |product|
+      if product.image.attached?
+        image_tag url_for(product.image), width: 50
+      elsif product.image_url.present?
+        image_tag product.image_url, width: 50
+      end
+    end
     actions
   end
 
@@ -28,8 +35,24 @@ ActiveAdmin.register Product do
       f.input :price
       f.input :sku
       f.input :is_active
-      f.input :image_url
+      f.input :image, as: :file, hint: (f.object.image.attached? ? image_tag(url_for(f.object.image), width: 100) : content_tag(:span, "No image yet"))
     end
     f.actions
+  end
+
+  show do
+    attributes_table do
+      row :name
+      row :price
+      row :description
+      row :category
+      row :image do |product|
+        if product.image.attached?
+          image_tag url_for(product.image)
+        elsif product.image_url.present?
+          image_tag product.image_url
+        end
+      end
+    end
   end
 end
