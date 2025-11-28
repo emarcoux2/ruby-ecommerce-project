@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :customers
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 
@@ -7,15 +8,15 @@ Rails.application.routes.draw do
     resources :customers
   end
 
-  root to: "home#index"
+  root to: "pages#home"
 
   resources :products, only: %i[ index show ]
   resources :categories, only: %i[ index show ]
   resources :cart_products, only: %i[ index show ]
 
-  post "cart", to: "carts#add", as: "cart_add"
-  delete "cart", to: "carts#destroy", as: "cart_destroy"
-  put "cart", to: "carts#quantity", as: "cart_quantity"
+  resource :cart, only: %i[ show update destroy ] do
+    post :add
+  end
 
   get "transactions/index"
   get "transactions/show"
@@ -29,8 +30,6 @@ Rails.application.routes.draw do
   get "addresses/show"
   get "customers/index"
   get "customers/show"
-  get "carts/index"
-  get "carts/show"
   get "cart_products/index"
   get "cart_products/show"
   get "categories/index"

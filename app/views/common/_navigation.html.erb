@@ -2,13 +2,26 @@
   <div class="navbar-menu is-active is-flex is-justify-content-center">
     <ul class="navbar-item" style="display: flex; gap: 1.5rem; list-style: none;">
 
-      <%# Home link only displays if the page is not the home page %>
-      <% unless controller_name == "home" %>
+      <% unless controller_name == "pages" %>
         <li><%= link_to "Home", root_path, class: "navbar-link" %></li>
       <% end %>
       <li><%= link_to "Products", products_path, class: "navbar-link" %></li>
       <li><%= link_to "Orders", orders_show_path, class: "navbar-link" %></li>
       <li><%= link_to "About", about_path, class: "navbar-link" %></li>
     </ul>
+
+    <div class="navbar-end" style="margin-left: auto; display: flex; gap: 1rem;">
+      <% cart_count = session[:cart]&.values&.sum || 0 %>
+      <%= link_to "🛒 Cart (#{cart_count})", cart_path, class: "navbar-item" %>
+      <% if customer_signed_in? %>
+        <span class="navbar-item">Hello, <%= current_customer.name %>!</span>
+        <%= link_to "Account", edit_customer_registration_path, class: "navbar-item" %>
+        <%= link_to "Logout", destroy_customer_session_path,
+                              data: { turbo_method: :delete }, class: "navbar-item" %>
+      <% else %>
+        <%= link_to "Sign In", new_customer_session_path, class: "navbar-item" %>
+        <%= link_to "Sign Up", new_customer_registration_path, class: "navbar-item" %>
+      <% end %>
+    </div>
   </div>
 </nav>

@@ -9,6 +9,8 @@ class Product < ApplicationRecord
   validates :price, numericality: true
   validates :name, uniqueness: true
 
+  has_one_attached :image
+
   def self.ransackable_attributes(auth_object = nil)
     [ "category_id", "created_at", "description", "id", "id_value", "image_url", "is_active", "name", "price", "quantity", "sku", "unit", "updated_at" ]
   end
