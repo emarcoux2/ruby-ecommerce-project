@@ -31,12 +31,20 @@ class CartsController < ApplicationController
   end
 
   def destroy
-    product_id = params[:product_id].to_s
+    # remove a single item from the cart
+    if params[:product_id].present?
+      product_id = params[:product_id].to_s
+      @cart.delete(product_id)
+      notice = "Product removed from cart!"
 
-    @cart.delete(product_id)
+    # remove all items from the cart
+    else
+      @cart.clear
+      notice = "All items have been removed from your cart!"
+    end
+
     session[:cart] = @cart
-
-    redirect_to cart_path, notice: "Product removed from cart!"
+    redirect_to cart_path, notice: notice
   end
 
   def show
