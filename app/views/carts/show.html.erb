@@ -37,4 +37,6 @@
       <% end %>
     </tbody>
   </table>
+  <p><%= button_to "Remove All Items", cart_path, method: :delete %></p>
+  <p><%= button_to "Checkout", cart_checkout_path, method: :post, data: { turbo: false } %></p>
 <% end %>
