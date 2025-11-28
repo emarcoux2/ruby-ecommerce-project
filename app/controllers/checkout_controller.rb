@@ -28,33 +28,41 @@ class CheckoutController < ApplicationController
   end
 
   def cart
+    if session[:cart].blank? || session[:cart].empty?
+      flash[:notice] = "Fill your cart with products to buy!"
+      redirect_to root_path and return
+    end
+
     products = Product.find(session[:cart].keys)
 
-    if products.nil? or products.empty?
-      flash[:notice] = "Fill your cart with products to buy!"
-      redirect_to root_path
+    line_items = products.map do |product|
+      quantity = session[:cart][product.id.to_s] || 1
 
-      session = Stripe::Checkout::Session.create(
-        payment_method_types: [ "card" ],
-        success_url: checkout_success_url,
-        cancel_url: checkout_cancel_url,
-        mode: "payment",
-        line_items: products.map do |product|
-          {
-            price_data: {
-              currency: "cad",
-              product_data: {
-                name: product.name,
-                description: product.description
-              },
-              unit_amount: product.price_cents
-            },
-            quantity: session[:cart][product.id.to_s]["quantity"]
-          }
-        end
-      )
-      redirect_to session.url, allow_other_host: true
+      product_data = { name: product.name }
+
+      if product.description.present? && product.description.strip != ""
+        product_data[:description] = product.description
+      end
+
+      {
+        price_data: {
+          currency: "cad",
+          product_data: product_data,
+          unit_amount: (product.price * 100).to_i
+        },
+        quantity: quantity
+      }
     end
+
+    checkout_session = Stripe::Checkout::Session.create(
+      payment_method_types: [ "card" ],
+      success_url: checkout_success_url,
+      cancel_url: checkout_cancel_url,
+      mode: "payment",
+      line_items: line_items
+    )
+
+    redirect_to checkout_session.url, allow_other_host: true
   end
 
   def cancel
