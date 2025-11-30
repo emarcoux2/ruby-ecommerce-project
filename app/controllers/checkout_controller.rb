@@ -8,19 +8,21 @@ class CheckoutController < ApplicationController
 
     session = Stripe::Checkout::Session.create(
       payment_method_types: [ "card" ],
-      success_url: checkout_success_url,
+      success_url: "#{checkout_success_url}?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: checkout_cancel_url,
       mode: "payment",
       line_items: [
-        price_data: {
-          currency: "cad",
-          product_data: {
-            name: product.name,
-            description: product.description
+        {
+          price_data: {
+            currency: "cad",
+            product_data: {
+              name: product.name,
+              description: product.description
+            },
+            unit_amount: product.price_cents
           },
-          unit_amount: product.price_cents
-        },
-        quantity: 1
+          quantity: 1
+        }
       ]
     )
 
@@ -56,7 +58,7 @@ class CheckoutController < ApplicationController
 
     checkout_session = Stripe::Checkout::Session.create(
       payment_method_types: [ "card" ],
-      success_url: checkout_success_url,
+      success_url: "#{checkout_success_url}?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: checkout_cancel_url,
       mode: "payment",
       line_items: line_items
@@ -65,10 +67,57 @@ class CheckoutController < ApplicationController
     redirect_to checkout_session.url, allow_other_host: true
   end
 
-  def cancel
+  def success
+    cart = session[:cart] || {}
+
+    if cart.empty?
+      redirect_to root_path, notice: "Your cart is empty!" and return
+    end
+
+    # wrapping the Order in a transaction in case something goes wrong.
+    # ensures that either the order and its products were saved,
+    # or nothing is saved if an error occurs
+    ActiveRecord::Base.transaction do
+      stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
+      payment_intent = Stripe::PaymentIntent.retrieve(stripe_session.payment_intent)
+      charge = Stripe::Charge.retrieve(payment_intent.latest_charge)
+      receipt_url = charge.receipt_url
+
+      order = current_customer.orders.create!(
+        total_price: 0,
+        status: "paid",
+        receipt_url: receipt_url,
+        order_date: Time.current
+      )
+
+      total_price = 0
+
+      cart.each do |product_id_str, quantity|
+        product = Product.find(product_id_str.to_i)
+        quantity = quantity.to_i
+        price_each = product.price
+
+        total_price += price_each * quantity
+
+        order.order_products.create!(
+          product: product,
+          quantity: quantity,
+          price_each: price_each
+        )
+      end
+
+      order.update!(total_price: total_price)
+    end
+
+    session[:cart] = {}
+
+    flash[:notice] = "Thank you for your order!"
+    redirect_to orders_index_path
+  rescue ActiveRecord::RecordInvalid => e
+    flash[:alert] = "We couldn't process your order at this time. #{e.message}"
+    redirect_to cart_path
   end
 
-  def success
-    session[:cart] = {}
+  def cancel
   end
 end

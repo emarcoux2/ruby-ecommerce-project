@@ -6,6 +6,6 @@
     <p>Date: <%= order.order_date.strftime("%b %d, %Y") %></p>
     <p>Total: <%= number_to_currency(order.total_price) %></p>
     <p>Status: <%= order.status %></p>
-    <p><%= link_to "View Details", order_path(order) %></p>
+    <p><%= link_to "View Details", orders_index_path(order) %></p>
   </div>
 <% end %>
