@@ -1,2 +1,30 @@
-<h1>Orders#show</h1>
-<p>Find me in app/views/orders/show.html.erb</p>
+<h1>Order #<%= @order.id %></h1>
+<p>Date: <%= @order.order_date.strftime("%b %d, %Y") %></p>
+<p>Total: <%= number_to_currency(@order.total_price) %></p>
+<p>Status: <%= @order.status %></p>
+
+<h2>Products in this Order</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Price Each</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @order_products.each do |op| %>
+      <tr>
+        <td><%= op.product.name %></td>
+        <td><%= op.quantity %></td>
+        <td><%= number_to_currency(op.price_each) %></td>
+        <td><%= number_to_currency(op.quantity * op.price_each) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @order.receipt_url.present? %>
+  <p><%= link_to "View Receipt", @order.receipt_url, target: "_blank" %></p>
+<% end %>
