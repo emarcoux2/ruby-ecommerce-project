@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :products, only: %i[ index show ]
   resources :categories, only: %i[ index show ]
   resources :cart_products, only: %i[ index show ]
+  resources :orders, only: %i[ index show ]
 
   resource :cart, only: %i[ show update destroy ] do
     post :add
@@ -29,8 +30,6 @@ Rails.application.routes.draw do
   get "transactions/show"
   get "order_products/index"
   get "order_products/show"
-  get "orders/index"
-  get "orders/show"
   get "payment_methods/index"
   get "payment_methods/show"
   get "addresses/index"

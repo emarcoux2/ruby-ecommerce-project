@@ -1,9 +1,10 @@
 <h1>Order #<%= @order.id %></h1>
-<p>Date: <%= @order.order_date.strftime("%b %d, %Y") %></p>
-<p>Total: <%= number_to_currency(@order.total_price) %></p>
-<p>Status: <%= @order.status %></p>
+<p><strong>Date:</strong> <%= @order.order_date.strftime("%b %d, %Y") %></p>
+<p><strong>Total:</strong> <%= number_to_currency(@order.total_price) %></p>
+<p><strong>Status:</strong> <%= @order.status %></p>
 
 <h2>Products in this Order</h2>
+
 <table>
   <thead>
     <tr>
@@ -13,6 +14,7 @@
       <th>Subtotal</th>
     </tr>
   </thead>
+  
   <tbody>
     <% @order_products.each do |op| %>
       <tr>

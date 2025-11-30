@@ -5,6 +5,11 @@ class OrdersController < ApplicationController
   end
 
   def show
+    if params[:id].blank?
+      redirect_to orders_path, alert: "No order specified." and return
+    end
+
+    @order = Order.find(params[:id])
     @order_products = @order.order_products.includes(:product)
   end
 
