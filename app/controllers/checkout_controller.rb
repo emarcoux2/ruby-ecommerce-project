@@ -1,105 +1,57 @@
 class CheckoutController < ApplicationController
-  TAX_RATES = Rails.application.config_for(:tax_rates)
-
-  puts "TAX_RATES = #{TAX_RATES.inspect}"
-
   before_action :authenticate_customer!
 
-  def calculate_tax_cents(amount_cents, province_code)
-    tax_rate = TAX_RATES[province_code] || 0
-    (amount_cents * tax_rate).round
-  end
-
-  def create
-    product = Product.find_by(id: params[:product_id])
-    unless product
-      redirect_to products_path, alert: "Product not found." and return
-    end
-
-    shipping_address = current_customer.addresses.find_by(is_primary: true)
-    unless shipping_address
-      redirect_to addresses_path, alert: "Please add a default shipping address first." and return
-    end
-
-    province_code = shipping_address.province
-    base_price_cents = product.price_cents
-    tax_cents = calculate_tax_cents(base_price_cents, province_code)
-
-    line_items = [
-      {
-        price_data: {
-          currency: "cad",
-          product_data: {
-            name: product.name,
-            description: product.description
-          },
-          unit_amount: base_price_cents
-        },
-        quantity: 1
-      },
-      {
-        price_data: {
-          currency: "cad",
-          product_data: {
-            name: "Tax (#{province_code})"
-          },
-          unit_amount: tax_cents
-        },
-        quantity: 1
-      }
-    ]
-
-    session = Stripe::Checkout::Session.create(
-      payment_method_types: [ "card" ],
-      success_url: "#{checkout_success_url}?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: checkout_cancel_url,
-      mode: "payment",
-      line_items: line_items,
-      shipping_address_collection: {
-        allowed_countries: [ "CA" ]
-      }
-    )
-
-    redirect_to session.url, allow_other_host: true
-  end
+  include Taxable
 
   def cart
-    if session[:cart].blank? || session[:cart].empty?
-      redirect_to root_path, notice: "Fill your cart with products to buy!" and return
+    redirect_to cart_path
+  end
+
+  def create_checkout_session
+    cart = session[:cart] || {}
+    if cart.empty?
+      redirect_to cart_path, alert: "Your cart is empty!" and return
     end
 
     shipping_address = current_customer.addresses.find_by(is_primary: true)
     unless shipping_address
       redirect_to addresses_path, alert: "Please add a default shipping address first." and return
     end
-    province_code = shipping_address.province
 
-    products = Product.find(session[:cart].keys)
+    province_code = shipping_address.province_code
 
-    line_items = products.map do |product|
-      quantity = session[:cart][product.id.to_s].to_i
-      base_price_cents = (product.price * 100).to_i
-      tax_cents = calculate_tax_cents(base_price_cents * quantity, province_code)
+    subtotal_cents = cart.sum do |product_id, quantity|
+      product = Product.find(product_id.to_i)
+      (product.price * 100).to_i * quantity.to_i
+    end
 
-      [
-        {
-          price_data: {
-            currency: "cad",
-            product_data: { name: product.name, description: product.description.presence },
-            unit_amount: base_price_cents
-          },
-          quantity: quantity
+    tax_cents_value = tax_cents(subtotal_cents, province_code)
+
+    puts "Province stored in DB: #{shipping_address.province.inspect}"
+    puts "Province code used: #{province_code}"
+    puts "Subtotal cents: #{subtotal_cents}"
+    puts "Tax cents: #{tax_cents_value}"
+
+    line_items = cart.map do |product_id, quantity|
+      product = Product.find(product_id.to_i)
+      {
+        price_data: {
+          currency: "cad",
+          product_data: { name: product.name, description: product.description },
+          unit_amount: (product.price * 100).to_i
         },
-        {
-          price_data: {
-            currency: "cad",
-            product_data: { name: "Tax (#{province_code}) for #{product.name}" },
-            unit_amount: tax_cents
-          },
-          quantity: 1
-        }
-      ]
-    end.flatten
+        quantity: quantity
+      }
+    end
+
+    line_items << {
+      price_data: {
+        currency: "cad",
+        product_data: { name: "Tax (#{province_code})" },
+        unit_amount: tax_cents_value
+      },
+      quantity: 1
+    }
 
     checkout_session = Stripe::Checkout::Session.create(
       payment_method_types: [ "card" ],
@@ -122,11 +74,14 @@ class CheckoutController < ApplicationController
     stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
     payment_intent = Stripe::PaymentIntent.retrieve(stripe_session.payment_intent)
 
-    province_code = if stripe_session.shipping.present?
-                      stripe_session.shipping.address.state
-    else
-                      current_customer.addresses.first&.province || "ON"
-    end
+    shipping_address =
+      if stripe_session.shipping.present?
+        current_customer.addresses.find_by(province: stripe_session.shipping.address.state)
+      else
+        current_customer.addresses.find_by(is_primary: true)
+      end
+
+    province_code = shipping_address.province
     tax_rate = TAX_RATES[province_code] || 0
 
     charge = Stripe::Charge.retrieve(payment_intent.latest_charge)

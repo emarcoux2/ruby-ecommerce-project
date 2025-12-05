@@ -61,7 +61,6 @@ class AddressesController < ApplicationController
       :city,
       :province,
       :postal_code,
-      :country,
       :is_primary
     )
   end

@@ -1,18 +1,16 @@
 class CartsController < ApplicationController
   before_action :initialize_cart
 
+  include Taxable
+
   def add
     product_id = params[:product_id].to_s
     quantity = (params[:quantity] || 1).to_i
 
-    product = Product.find(product_id)
-
-    session[:cart] ||= {}
-
     session[:cart][product_id] ||= 0
     session[:cart][product_id] += quantity
 
-    flash[:notice] = "#{product.name} was added to your cart."
+    flash[:notice] = "#{Product.find(product_id).name} added to cart."
     redirect_back fallback_location: products_path
   end
 
@@ -33,8 +31,7 @@ class CartsController < ApplicationController
   def destroy
     # remove a single item from the cart
     if params[:product_id].present?
-      product_id = params[:product_id].to_s
-      @cart.delete(product_id)
+      @cart.delete(params[:product_id].to_s)
       notice = "Product removed from cart!"
 
     # remove all items from the cart
@@ -49,6 +46,19 @@ class CartsController < ApplicationController
 
   def show
     @cart_products = Product.where(id: @cart.keys)
+
+    @subtotal_cents = @cart_products.sum do |product|
+      qty = @cart[product.id.to_s].to_i
+      (product.price * 100).to_i * qty
+    end
+
+    @subtotal_cents ||= 0
+
+    shipping_address = current_customer.addresses.find_by(is_primary: true)
+    province_code = shipping_address.province_code
+    @tax_cents = tax_cents(@subtotal_cents, province_code)
+
+    @total_cents = @subtotal_cents + @tax_cents
   end
 
   private
