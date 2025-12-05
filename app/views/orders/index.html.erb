@@ -4,7 +4,7 @@
   <div class="order-card">
     <p>Order #: <%= order.id %></p>
     <p>Date: <%= order.order_date.strftime("%b %d, %Y") %></p>
-    <p>Total: <%= number_to_currency(order.total_price) %></p>
+    <p>Total: <%= number_to_currency(order.total_price/100) %></p>
     <p>Status: <%= order.status %></p>
     <p><%= link_to "View Details", order_path(order) %></p>
   </div>
