@@ -47,6 +47,8 @@ class CartsController < ApplicationController
   def show
     @cart_products = Product.where(id: @cart.keys)
 
+    @primary_address = current_customer.addresses.find_by(is_primary: true)
+
     @subtotal_cents = @cart_products.sum do |product|
       qty = @cart[product.id.to_s].to_i
       (product.price * 100).to_i * qty

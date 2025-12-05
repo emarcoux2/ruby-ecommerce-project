@@ -30,6 +30,24 @@
     </tbody>
   </table>
   
+  <% if @primary_address %>
+    <div class="primary-address-box">
+      <h3>Your Shipping Address</h3>
+      <p>
+        <%= @primary_address.street %><br>
+        <%= @primary_address.city %>, <%= @primary_address.province %><br>
+        <%= @primary_address.postal_code %>
+      </p>
+
+      <%= link_to "Edit Address", addresses_path, class: "btn btn-secondary" %>
+    </div>
+  <% else %>
+    <p>
+      You haven't set a default shipping address yet.
+      <%= link_to "Add Address", new_address_path, class: "btn btn-primary" %>
+    </p>
+  <% end %>
+  
   <p><strong>Subtotal:</strong> <%= number_to_currency(@subtotal_cents / 100.0) %></p>
   <p><strong>Taxes:</strong> <%= number_to_currency(@tax_cents / 100.0) %></p>
   <p><strong>Total:</strong> <%= number_to_currency(@total_cents / 100.0) %></p>
