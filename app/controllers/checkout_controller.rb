@@ -27,17 +27,16 @@ class CheckoutController < ApplicationController
 
     tax_cents_value = tax_cents(subtotal_cents, province_code)
 
-    puts "Province stored in DB: #{shipping_address.province.inspect}"
-    puts "Province code used: #{province_code}"
-    puts "Subtotal cents: #{subtotal_cents}"
-    puts "Tax cents: #{tax_cents_value}"
-
     line_items = cart.map do |product_id, quantity|
       product = Product.find(product_id.to_i)
       {
         price_data: {
           currency: "cad",
-          product_data: { name: product.name, description: product.description },
+          product_data: {
+            name: product.name
+          }.tap do |pd|
+            pd[:description] = product.description if product.description.present?
+          end,
           unit_amount: (product.price * 100).to_i
         },
         quantity: quantity
@@ -66,64 +65,72 @@ class CheckoutController < ApplicationController
   end
 
   def success
-    cart = session[:cart] || {}
-    if cart.empty?
-      redirect_to root_path, notice: "Your cart is empty!" and return
-    end
+  cart = session[:cart] || {}
+  if cart.empty?
+    redirect_to root_path, notice: "Your cart is empty!" and return
+  end
 
-    stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    payment_intent = Stripe::PaymentIntent.retrieve(stripe_session.payment_intent)
+  stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
+  payment_intent = Stripe::PaymentIntent.retrieve(stripe_session.payment_intent)
 
-    shipping_address =
-      if stripe_session.shipping.present?
-        current_customer.addresses.find_by(province: stripe_session.shipping.address.state)
-      else
-        current_customer.addresses.find_by(is_primary: true)
-      end
-
+  # Determine province from Stripe shipping OR fallback to customer's primary address
+  if stripe_session.respond_to?(:shipping) && stripe_session.shipping
+    province_code = stripe_session.shipping.address.state
+    shipping_address = current_customer.addresses.find_by(province: province_code)
+  else
+    shipping_address = current_customer.addresses.find_by(is_primary: true)
     province_code = shipping_address.province
-    tax_rate = TAX_RATES[province_code] || 0
+  end
 
-    charge = Stripe::Charge.retrieve(payment_intent.latest_charge)
-    receipt_url = charge.receipt_url
+  tax_rate = TAX_RATES[province_code] || 0
 
-    # wrapping the Order in a transaction in case something goes wrong.
-    # ensures that either the order and its products were saved,
-    # or nothing is saved if an error occurs
-    ActiveRecord::Base.transaction do
-      order = current_customer.orders.create!(
-        total_price: 0,
-        status: "paid",
-        receipt_url: receipt_url,
-        order_date: Time.current
+  charge = Stripe::Charge.retrieve(payment_intent.latest_charge)
+  receipt_url = charge.receipt_url
+
+  ActiveRecord::Base.transaction do
+    order = current_customer.orders.create!(
+      total_price: 0,
+      tax_cents: 0,
+      status: "paid",
+      receipt_url: receipt_url,
+      order_date: Time.current
+    )
+
+    subtotal_cents = 0
+    total_tax_cents = 0
+
+    cart.each do |product_id_str, quantity|
+      product = Product.find(product_id_str.to_i)
+      quantity = quantity.to_i
+
+      price_each_cents = (product.price * 100).to_i
+      line_total_cents = price_each_cents * quantity
+      line_tax_cents = (line_total_cents * tax_rate).round
+
+      subtotal_cents += line_total_cents
+      total_tax_cents += line_tax_cents
+
+      order.order_products.create!(
+        product: product,
+        quantity: quantity,
+        price_each: price_each_cents
       )
-
-      total_price = 0
-
-      cart.each do |product_id_str, quantity|
-        product = Product.find(product_id_str.to_i)
-        quantity = quantity.to_i
-        price_each = product.price
-        line_total = price_each * quantity
-        tax_amount = line_total * tax_rate
-
-        total_price += line_total + tax_amount
-
-        order.order_products.create!(
-          product: product,
-          quantity: quantity,
-          price_each: price_each
-        )
-      end
-
-      order.update!(total_price: total_price)
     end
 
-    session[:cart] = {}
-    redirect_to orders_index_path, notice: "Thank you for your order!"
+    order.update!(
+      total_price: subtotal_cents + total_tax_cents,
+      tax_cents: total_tax_cents
+    )
+    puts "Saved subtotal_cents: #{subtotal_cents}"
+    puts "Saved tax_cents: #{total_tax_cents}"
+  end
+
+  session[:cart] = {}
+  redirect_to orders_path, notice: "Thank you for your order!"
   rescue ActiveRecord::RecordInvalid => e
     redirect_to cart_path, alert: "We couldn't process your order at this time. #{e.message}"
   end
+
 
   def cancel
   end
