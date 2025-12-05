@@ -121,8 +121,6 @@ class CheckoutController < ApplicationController
       total_price: subtotal_cents + total_tax_cents,
       tax_cents: total_tax_cents
     )
-    puts "Saved subtotal_cents: #{subtotal_cents}"
-    puts "Saved tax_cents: #{total_tax_cents}"
   end
 
   session[:cart] = {}
