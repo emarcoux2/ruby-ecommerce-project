@@ -34,23 +34,6 @@
     <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
   </div>
 
-  <h3>Shipping Address (optional)</h3>
-  <div>
-    <%= f.fields_for :addresses do |a| %>
-      <%= a.label :street %>
-      <%= a.text_field :street %>
-
-      <%= a.label :city %>
-      <%= a.text_field :city %>
-
-      <%= a.label :province %>
-      <%= a.text_field :province %>
-
-      <%= a.label :postal_code %>
-      <%= a.text_field :postal_code %>
-    <% end %>
-  </div>
-
   <div class="actions">
     <%= f.submit "Sign up" %>
   </div>

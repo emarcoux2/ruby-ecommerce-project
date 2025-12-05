@@ -1,0 +1,32 @@
+<h1>Add a New Address</h1>
+
+<%= form_with model: @address, local: true do |f| %>
+  <div>
+    <%= f.label :street %>
+    <%= f.text_field :street %>
+  </div>
+
+  <div>
+    <%= f.label :city %>
+    <%= f.text_field :city %>
+  </div>
+
+  <div>
+    <%= f.label :province %>
+    <%= f.text_field :province %>
+  </div>
+
+  <div>
+    <%= f.label :postal_code %>
+    <%= f.text_field :postal_code %>
+  </div>
+
+  <div>
+    <%= f.label :is_primary, "Set as primary" %>
+    <%= f.check_box :is_primary %>
+  </div>
+
+  <div>
+    <%= f.submit "Save Address", class: "button is-primary" %>
+  </div>
+<% end %>

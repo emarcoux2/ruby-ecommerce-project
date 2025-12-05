@@ -1,2 +1,19 @@
-<h1>Addresses#index</h1>
-<p>Find me in app/views/addresses/index.html.erb</p>
+<h1>Your Addresses</h1>
+
+<% if @addresses.present? %>
+  <ul>
+    <% @addresses.each do |address| %>
+      <li>
+        <%= address.street %>, <%= address.city %>, <%= address.province %>, <%= address.postal_code %>
+        <% if address.is_primary %>(Primary Address)<% end %>
+        |
+        <%= link_to "Edit", edit_address_path(address) %>
+        <%= link_to "Delete", address_path(address), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this address?" } %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>You have no addresses yet. <%= link_to "Add one", new_address_path %></p>
+<% end %>
+
+<p><%= link_to "Add New Address", new_address_path %></p>

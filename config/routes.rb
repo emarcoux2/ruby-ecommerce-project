@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
   root to: "pages#home"
 
+  resources :addresses
   resources :products, only: %i[ index show ]
   resources :categories, only: %i[ index show ]
   resources :cart_products, only: %i[ index show ]
@@ -22,9 +23,13 @@ Rails.application.routes.draw do
   scope "/checkout" do
     post "create", to: "checkout#create", as: "checkout_create"
     post "cart", to: "checkout#cart", as: "cart_checkout"
+    get "cart", to: "checkout#cart"
     get "success", to: "checkout#success", as: "checkout_success"
     get "cancel", to: "checkout#cancel", as: "checkout_cancel"
   end
+
+  get "checkout/address", to: "checkout#address"
+  post "checkout/set_address", to: "checkout#set_address"
 
   get "transactions/index"
   get "transactions/show"
@@ -32,8 +37,6 @@ Rails.application.routes.draw do
   get "order_products/show"
   get "payment_methods/index"
   get "payment_methods/show"
-  get "addresses/index"
-  get "addresses/show"
   get "customers/index"
   get "customers/show"
   get "cart_products/index"
