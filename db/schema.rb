@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_30_181749) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_05_124301) do
   create_table "abouts", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -148,6 +148,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_181749) do
     t.datetime "order_date"
     t.string "receipt_url"
     t.string "status"
+    t.integer "tax_cents", default: 0, null: false
     t.decimal "total_price"
     t.datetime "updated_at", null: false
     t.index ["customer_id"], name: "index_orders_on_customer_id"
