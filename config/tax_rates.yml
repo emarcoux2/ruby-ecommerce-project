@@ -1,0 +1,23 @@
+default: &default
+  ON: 0.13
+  BC: 0.12
+  AB: 0.05
+  QC: 0.14975
+  MB: 0.12
+  SK: 0.11
+  NS: 0.14
+  NB: 0.15
+  NL: 0.15
+  NT: 0.05
+  PE: 0.15
+  NU: 0.05
+  YU: 0.05
+
+development:
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default

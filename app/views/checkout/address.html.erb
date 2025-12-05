@@ -1,0 +1,16 @@
+<h1>Choose Shipping Address</h1>
+
+<%= form_with url: checkout_set_address_path, method: :post, local: true do %>
+  <% @addresses.each do |address| %>
+    <div>
+      <label>
+        <%= radio_button_tag :address_id, address.id, session[:checkout_address_id].to_i == address.id %>
+        <%= address.full_address %>
+      </label>
+    </div>
+  <% end %>
+
+  <%= submit_tag "Continue to Checkout", class: "button is-primary" %>
+<% end %>
+
+<%= link_to "Add New Address", new_address_path, class: "button is-link mt-2"%>
