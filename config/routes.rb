@@ -21,12 +21,11 @@ Rails.application.routes.draw do
   end
 
   scope "/checkout" do
-    post "create", to: "checkout#create", as: "checkout_create"
-    post "cart", to: "checkout#cart", as: "cart_checkout"
-    get "cart", to: "checkout#cart"
+    post "create_session", to: "checkout#create_checkout_session", as: "checkout_create_session"
+    get "cart", to: "checkout#cart", as: "checkout_cart"
     get "success", to: "checkout#success", as: "checkout_success"
     get "cancel", to: "checkout#cancel", as: "checkout_cancel"
-  end
+end
 
   get "checkout/address", to: "checkout#address"
   post "checkout/set_address", to: "checkout#set_address"
