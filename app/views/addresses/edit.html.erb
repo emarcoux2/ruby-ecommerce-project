@@ -1,34 +1,71 @@
-<h1>Edit Address</h1>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <div class="card">
+          <div class="card-content">
+            <h1 class="title is-3 has-text-centered mb-4">Edit Address</h1>
 
-<%= form_with model: @address, local: true do |f| %>
-  <div>
-    <%= f.label :street %><br>
-    <%= f.text_field :street %>
+            <%= form_with model: @address, local: true do |f| %>
+
+              <div class="field">
+                <%= f.label :street, class: "label" %>
+                <div class="control">
+                  <%= f.text_field :street, class: "input" %>
+                </div>
+              </div>
+
+              <div class="field">
+                <%= f.label :city, class: "label" %>
+                <div class="control">
+                  <%= f.text_field :city, class: "input" %>
+                </div>
+              </div>
+
+              <div class="field">
+                <%= f.label :province, class: "label" %>
+                <div class="control">
+                  <%= f.select :province, [
+                        "Alberta", "British Columbia", "Manitoba", "New Brunswick",
+                        "Newfoundland and Labrador", "Nova Scotia", "Ontario",
+                        "Prince Edward Island", "Quebec", "Saskatchewan",
+                        "Northwest Territories", "Nunavut", "Yukon"
+                      ],
+                      { include_blank: "Select Province/Territory" },
+                      class: "input"
+                  %>
+                </div>
+              </div>
+
+              <div class="field">
+                <%= f.label :postal_code, class: "label" %>
+                <div class="control">
+                  <%= f.text_field :postal_code, class: "input" %>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <%= f.check_box :is_primary %>
+                    Set as primary
+                  </label>
+                </div>
+              </div>
+
+              <div class="field mt-4">
+                <div class="control">
+                  <%= f.submit "Update Address", class: "button is-primary is-fullwidth is-medium" %>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="has-text-centered mt-3">
+              <%= link_to "Back to Addresses", addresses_path, class: "button is-light" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div>
-    <%= f.label :city %><br>
-    <%= f.text_field :city %>
-  </div>
-
-  <div>
-    <%= f.label :province %><br>
-    <%= f.text_field :province %>
-  </div>
-
-  <div>
-    <%= f.label :postal_code %><br>
-    <%= f.text_field :postal_code %>
-  </div>
-
-  <div>
-    <%= f.label :is_primary %>
-    <%= f.check_box :is_primary %>
-  </div>
-
-  <div>
-    <%= f.submit "Update Address" %>
-  </div>
-<% end %>
-
-<p><%= link_to "Back to Addresses", addresses_path %></p>
+</section>

@@ -1,32 +1,66 @@
-<h1>Add a New Address</h1>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-half">
+        <div class="card">
+          <div class="card-content">
+            <h1 class="title is-3 has-text-centered mb-4">Add a New Address</h1>
 
-<%= form_with model: @address, local: true do |f| %>
-  <div>
-    <%= f.label :street %>
-    <%= f.text_field :street %>
-  </div>
+            <%= form_with model: @address, local: true do |f| %>
+              <div class="field">
+                <%= f.label :street, class: "label has-text-weight-bold" %>
+                <div class="control">
+                  <%= f.text_field :street, class: "input" %>
+                </div>
+              </div>
 
-  <div>
-    <%= f.label :city %>
-    <%= f.text_field :city %>
-  </div>
+              <div class="field">
+                <%= f.label :city, class: "label has-text-weight-bold" %>
+                <div class="control">
+                  <%= f.text_field :city, class: "input" %>
+                </div>
+              </div>
 
-  <div>
-    <%= f.label :province %>
-    <%= f.text_field :province %>
-  </div>
+              <div class="field">
+                <%= f.label :province, class: "label has-text-weight-bold" %>
+                <div class="control">
+                  <%= f.select :province, [
+                        "Alberta", "British Columbia", "Manitoba", "New Brunswick",
+                        "Newfoundland and Labrador", "Nova Scotia", "Ontario",
+                        "Prince Edward Island", "Quebec", "Saskatchewan",
+                        "Northwest Territories", "Nunavut", "Yukon"
+                      ],
+                      { include_blank: "Select Province/Territory" },
+                      class: "input"
+                  %>
+                </div>
+              </div>
 
-  <div>
-    <%= f.label :postal_code %>
-    <%= f.text_field :postal_code %>
-  </div>
+              <div class="field">
+                <%= f.label :postal_code, class: "label has-text-weight-bold" %>
+                <div class="control">
+                  <%= f.text_field :postal_code, class: "input" %>
+                </div>
+              </div>
 
-  <div>
-    <%= f.label :is_primary, "Set as primary" %>
-    <%= f.check_box :is_primary %>
-  </div>
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <%= f.check_box :is_primary %>
+                    Set as primary address
+                  </label>
+                </div>
+              </div>
 
-  <div>
-    <%= f.submit "Save Address", class: "button is-primary" %>
+              <div class="field mt-4">
+                <div class="control">
+                  <%= f.submit "Save Address", class: "button is-primary is-fullwidth is-medium" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-<% end %>
+</section>
