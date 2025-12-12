@@ -5,9 +5,7 @@
         <div class="card">
           <div class="card-content">
             <h1 class="title is-3 has-text-centered mb-4">Edit Address</h1>
-
             <%= form_with model: @address, local: true do |f| %>
-
               <div class="field">
                 <%= f.label :street, class: "label" %>
                 <div class="control">
@@ -59,7 +57,6 @@
                 </div>
               </div>
             <% end %>
-
             <div class="has-text-centered mt-3">
               <%= link_to "Back to Addresses", addresses_path, class: "button is-light" %>
             </div>
