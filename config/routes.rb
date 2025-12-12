@@ -30,18 +30,8 @@ end
   get "checkout/address", to: "checkout#address"
   post "checkout/set_address", to: "checkout#set_address"
 
-  get "transactions/index"
-  get "transactions/show"
-  get "order_products/index"
-  get "order_products/show"
-  get "payment_methods/index"
-  get "payment_methods/show"
   get "customers/index"
   get "customers/show"
-  get "cart_products/index"
-  get "cart_products/show"
-  get "categories/index"
-  get "categories/show"
 
   get "/about",   to: "pages#show", page_type: "about"
   get "/contact", to: "pages#show", page_type: "contact"
