@@ -45,11 +45,11 @@
               <p class="is-size-6">
                 Placed on <%= @recent_order.order_date.strftime("%b %d, %Y") %>
               </p>
-              <p class="is-size-6 has-text-success">
+              <p class="is-size-5 has-text-success has-text-weight-semibold">
                 Total: <%= number_to_currency(@recent_order.total_price/100.0) %>
               </p>
               <div class="mt-2">
-                <%= link_to "View Details", order_path(@recent_order), class: "button is-link is-small" %>
+                <%= link_to "View Details", order_path(@recent_order), class: "button is-link" %>
               </div>
             <% else %>
               <p class="is-size-5 has-text-grey">No orders yet.</p>

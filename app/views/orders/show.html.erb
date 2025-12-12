@@ -31,7 +31,7 @@
         <div class="column is-3">
           <% if @order.receipt_url.present? %>
             <%= link_to "View Receipt", @order.receipt_url,
-                  class: "button is-link is-light is-small mt-4",
+                  class: "button is-link mt-4",
                   target: "_blank" %>
           <% end %>
         </div>
