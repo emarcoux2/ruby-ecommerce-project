@@ -1,34 +1,90 @@
-<h1>Order #<%= @order.id %></h1>
-<p><strong>Date:</strong> <%= @order.order_date.strftime("%b %d, %Y") %></p>
-<p><strong>Subtotal:</strong> <%= number_to_currency((@order.total_price - @order.tax_cents)/100.0) %></p>
-<p><strong>Taxes:</strong> <%= number_to_currency(@order.tax_cents/100.0) %></p>
-<p><strong>Total:</strong> <%= number_to_currency(@order.total_price/100.0) %></p>
-<p><strong>Status:</strong> <%= @order.status %></p>
+<div class="container mt-5">
+  <div class="card mb-5">
+    <header class="card-header">
+      <p class="card-header-title">
+        Order #<%= @order.id %>
+      </p>
+    </header>
 
-<h2>Products in this Order</h2>
+    <div class="card-content">
+      <div class="columns is-multiline">
+        
+        <div class="column is-3">
+          <p class="is-size-7 has-text-grey">Order Placed</p>
+          <p class="has-text-weight-semibold">
+            <%= @order.order_date.strftime("%b %d, %Y") %>
+          </p>
+        </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Quantity</th>
-      <th>Price Each</th>
-      <th>Subtotal</th>
-    </tr>
-  </thead>
-  
-  <tbody>
+        <div class="column is-3">
+          <p class="is-size-7 has-text-grey">Total</p>
+          <p class="has-text-weight-semibold">
+            <%= number_to_currency(@order.total_price/100.0) %>
+          </p>
+        </div>
+
+        <div class="column is-3">
+          <p class="is-size-7 has-text-grey">Status</p>
+          <p class="has-text-weight-semibold"><%= @order.status %></p>
+        </div>
+
+        <div class="column is-3">
+          <% if @order.receipt_url.present? %>
+            <%= link_to "View Receipt", @order.receipt_url,
+                  class: "button is-link is-light is-small mt-4",
+                  target: "_blank" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2 class="title is-5 mb-4">Items</h2>
+
     <% @order_products.each do |op| %>
-      <tr>
-        <td><%= op.product.name %></td>
-        <td><%= op.quantity %></td>
-        <td><%= number_to_currency(op.price_each/100) %></td>
-        <td><%= number_to_currency(op.quantity * op.price_each/100) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+      <div class="columns is-vcentered is-mobile py-4"
+           style="border-bottom: 1px solid #eee;">
+        <div class="column is-5">
+          <p class="is-size-6 has-text-weight-semibold">
+            <%= link_to op.product.name, product_path(op.product) %>
+          </p>
+        </div>
 
-<% if @order.receipt_url.present? %>
-  <p><%= link_to "View Receipt", @order.receipt_url, target: "_blank" %></p>
-<% end %>
+        <div class="column is-2 has-text-centered">
+          <p class="is-size-7 has-text-grey">Qty</p>
+          <p class="has-text-weight-semibold"><%= op.quantity %></p>
+        </div>
+
+        <div class="column is-2 has-text-centered">
+          <p class="is-size-7 has-text-grey">Price</p>
+          <p class="has-text-weight-semibold">
+            <%= number_to_currency(op.price_each/100.0) %>
+          </p>
+        </div>
+
+        <div class="column is-3 has-text-right">
+          <p class="is-size-7 has-text-grey">Item Subtotal</p>
+          <p class="has-text-weight-semibold">
+            <%= number_to_currency(op.quantity * op.price_each / 100.0) %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="mt-5 has-text-right">
+      <p>
+        <strong>Subtotal:</strong>
+        <%= number_to_currency((@order.total_price - @order.tax_cents)/100.0) %>
+      </p>
+      <p>
+        <strong>Taxes:</strong>
+        <%= number_to_currency(@order.tax_cents/100.0) %>
+      </p>
+      <p class="is-size-5 mt-2">
+        <strong>Total:</strong>
+        <%= number_to_currency(@order.total_price/100.0) %>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,45 +1,50 @@
-<h1 class="title is-1">All Products</h1>
+<h1 class="title is-1 has-text-centered">All Products</h1>
 
-<form action="<%= products_path %>" method="get">
-  <div class="field is-grouped is-grouped-multiline">
-    <div class="control">
-      <input class="input" type="text" name="query" placeholder="Search products" value="<%= params[:query] %>">
+<section class="section">
+  <div class="container is-max-desktop">
+    <form action="<%= products_path %>" method="get">
+      <div class="field is-grouped is-grouped-multiline">
+        <div class="control">
+          <input class="input" type="text" name="query" placeholder="Search products" value="<%= params[:query] %>">
+        </div>
+
+        <div class="control">
+          <div class="select">
+            <select onchange="
+              let query = '<%= params[:query].to_s %>';
+              let url = '/products?category=' + this.value;
+              if (query.length > 0) { url += '&query=' + encodeURIComponent(query); }
+              window.location.href = url;
+            ">
+              <option value="">Search by Category</option>
+              <% @categories.each do |category| %>
+                <option value="<%= category.id %>" <%= "selected" if @selected_category == category %>>
+                  <%= category.name %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <% if @selected_category %>
+      <p class="has-text-weight-bold">
+        Showing products in: <%= @selected_category.name %>
+      </p>
+    <% end %>
+
+    <div class="columns is-multiline">
+      <% @products.each do |product| %>
+        <div class="column is-one-quarter">
+          <%= render partial: "product", locals: { product: product, show_name: true } %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="control">
-      <div class="select">
-        <select onchange="
-          let query = '<%= params[:query].to_s %>';
-          let url = '/products?category=' + this.value;
-          if (query.length > 0) { url += '&query=' + encodeURIComponent(query); }
-          window.location.href = url;
-        ">
-          <option value="">Search by Category</option>
-          <% @categories.each do |category| %>
-            <option value="<%= category.id %>" <%= "selected" if @selected_category == category %>>
-              <%= category.name %>
-            </option>
-          <% end %>
-        </select>
-      </div>
+    <div>
+      <%= paginate @products, params: { category: params[:category], query: params[:query] } %>
     </div>
   </div>
-</form>
+</section>
 
-<% if @selected_category %>
-  <p class="has-text-weight-bold">
-    Showing products in: <%= @selected_category.name %>
-  </p>
-<% end %>
-
-<div class="columns is-multiline">
-  <% @products.each do |product| %>
-    <div class="column is-one-quarter">
-      <%= render partial: "product", locals: { product: product, show_name: true } %>
-    </div>
-  <% end %>
-</div>
-
-<div>
-  <%= paginate @products, params: { category: params[:category], query: params[:query] } %>
-</div>

@@ -1,57 +1,118 @@
-<h1 class="title">Your Cart</h1>
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">Your Cart</h1>
 
-<% if @cart_products.empty? %>
-  <p>Your cart is empty! Go shopping!</p>
-<% else %>
-  <table class="table is-striped is-fullwidth">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Subtotal</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @cart_products.each do |product| %>
-        <% qty = @cart[product.id.to_s] %>
-        <tr>
-          <td><%= link_to product.name, product %></td>
-          <td><%= qty %></td>
-          <td><%= number_to_currency(product.price) %></td>
-          <td><%= number_to_currency(product.price * qty) %></td>
-          <td>
-            <%= button_to "Remove", cart_path(product_id: product.id), method: :delete %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-    </tbody>
-  </table>
-  
-  <% if @primary_address %>
-    <div class="primary-address-box">
-      <h3>Your Shipping Address</h3>
-      <p>
-        <%= @primary_address.street %><br>
-        <%= @primary_address.city %>, <%= @primary_address.province %><br>
-        <%= @primary_address.postal_code %>
-      </p>
+    <% if @cart_products.empty? %>
+      <p class="has-text-centered">Your cart is empty! Go shopping!</p>
+    <% else %>
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <% @cart_products.each do |product| %>
+            <% qty = @cart[product.id.to_s] %>
 
-      <%= link_to "Edit Address", addresses_path, class: "btn btn-secondary" %>
-    </div>
-  <% else %>
-    <p>
-      You haven't set a default shipping address yet.
-      <%= link_to "Add Address", new_address_path, class: "btn btn-primary" %>
-    </p>
-  <% end %>
-  
-  <p><strong>Subtotal:</strong> <%= number_to_currency(@subtotal_cents / 100.0) %></p>
-  <p><strong>Taxes:</strong> <%= number_to_currency(@tax_cents / 100.0) %></p>
-  <p><strong>Total:</strong> <%= number_to_currency(@total_cents / 100.0) %></p>
+            <div class="box mb-4">
+              <div class="columns is-vcentered">
+                <% if product.image.attached? || product.image_url.present? %>
+                  <div class="column is-3">
+                    <%= link_to product_path(product) do %>
+                      <% if product.image.attached? %>
+                        <%= image_tag url_for(product.image), class: "image", alt: product.name %>
+                      <% else %>
+                        <%= image_tag product.image_url, class: "image", alt: product.name %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
 
-  <p><%= button_to "Remove All Items", cart_path, method: :delete %></p>
-  <p><%= button_to "Checkout", checkout_create_session_path, method: :post, data: { turbo: false } %></p>
-<% end %>
+                <div class="column">
+                  <p class="title is-5 mb-1"><%= link_to product.name, product %></p>
+                  <p class="is-size-6">
+                    Quantity: <strong><%= qty %></strong>
+                  </p>
+                  <%= form_with url: cart_path, method: :patch, class: "mt-2" do %>
+                    <%= hidden_field_tag :product_id, product.id %>
+                    <div class="field has-addons">
+                      <div class="control">
+                        <%= number_field_tag :quantity, qty,
+                              min: 1,
+                              class: "input is-small",
+                              style: "width: 70px; text-align: center;" %>
+                      </div>
+
+                      <div class="control">
+                        <%= button_tag "Update",
+                              type: "submit",
+                              class: "button is-small is-primary" %>
+                      </div>
+                    </div>
+                  <% end %>
+                  <p class="is-size-6">
+                    Price: <strong><%= number_to_currency(product.price) %></strong>
+                  </p>
+                  <p class="mt-2 has-text-weight-semibold">
+                    Subtotal:
+                    <%= number_to_currency(product.price * qty) %>
+                  </p>
+                  <div class="mt-3">
+                    <%= button_to "Remove",
+                          cart_path(product_id: product.id),
+                          method: :delete,
+                          class: "button is-small is-danger is-light" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="column is-one-third">
+          <% if @primary_address %>
+            <div class="box mb-4">
+              <h3 class="title is-5">Shipping Address</h3>
+              <p>
+                <%= @primary_address.street %><br>
+                <%= @primary_address.city %>, <%= @primary_address.province %><br>
+                <%= @primary_address.postal_code %>
+              </p>
+              <%= link_to "Edit Address", addresses_path, class: "button is-light mt-2" %>
+            </div>
+          <% else %>
+            <div class="box mb-4">
+              <p>You haven't set a default shipping address yet.</p>
+              <%= link_to "Add Address", new_address_path, class: "button is-primary mt-2" %>
+            </div>
+          <% end %>
+
+          <div class="box">
+            <p class="is-size-5 mb-3 has-text-weight-semibold">Order Summary</p>
+            <p>
+              Subtotal:
+              <strong><%= number_to_currency(@subtotal_cents / 100.0) %></strong>
+            </p>
+            <p>
+              Taxes:
+              <strong><%= number_to_currency(@tax_cents / 100.0) %></strong>
+            </p>
+            <p class="is-size-5 mt-3">
+              Total:
+              <strong><%= number_to_currency(@total_cents / 100.0) %></strong>
+            </p>
+            
+            <div class="mt-4">
+              <%= button_to "Remove All Items",
+                    cart_path,
+                    method: :delete,
+                    class: "button is-danger is-light is-fullwidth mb-2" %>
+
+              <%= button_to "Checkout",
+                    checkout_create_session_path,
+                    method: :post,
+                    data: { turbo: false },
+                    class: "button is-primary is-fullwidth" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

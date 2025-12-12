@@ -12,12 +12,26 @@
   <% end %>
 
   <% if defined?(show_name) && show_name %>
-    <h3><%= link_to product.name, product %></h3>
+    <h3 class="title is-6">
+      <%= link_to product.name, product %>
+    </h3>
   <% end %>
 
   <%= form_with url: add_cart_path, method: :post do %>
-    <%= hidden_field_tag :product_id, product.id %>
-    <%= number_field_tag :quantity, 1, min: 1, class: "input" %>
+    <%= hidden_field_tag :product_id, product.id, id: nil %>
+    <div class="field is-grouped is-align-items-center mb-3">
+      <div class="control">
+        <%= number_field_tag :quantity, 1, min: 1,
+              class: "input is-small",
+              style: "width: 60px; text-align: center;",
+              id: nil %>
+      </div>
+      <div class="control">
+        <p class="has-text-weight-semibold is-size-6 mb-0 ml-2">
+          <%= number_to_currency(product.price) %>
+        </p>
+      </div>
+    </div>
     <%= button_tag "Add To Cart 💳", class: "button is-primary" %>
   <% end %>
 </aside>

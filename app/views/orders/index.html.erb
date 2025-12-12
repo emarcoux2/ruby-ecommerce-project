@@ -1,11 +1,49 @@
-<h1>Past Orders</h1>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h1 class="title is-3 has-text-centered mb-5">Past Orders</h1>
+    <% if @orders.empty? %>
+      <p class="has-text-centered">You have no past orders.</p>
+    <% else %>
+      <div class="columns is-multiline">
+        <% @orders.each do |order| %>
+          <div class="column is-full">
+            <div class="card mb-4">
+              <div class="card-content">
+                <div class="columns is-mobile is-vcentered">
+                  <div class="column is-2">
+                    <p class="is-size-7 has-text-grey">Order #</p>
+                    <p class="has-text-weight-semibold"><%= order.id %></p>
+                  </div>
 
-<% @orders.each do |order| %>
-  <div class="order-card">
-    <p>Order #: <%= order.id %></p>
-    <p>Date: <%= order.order_date.strftime("%b %d, %Y") %></p>
-    <p>Total: <%= number_to_currency(order.total_price/100) %></p>
-    <p>Status: <%= order.status %></p>
-    <p><%= link_to "View Details", order_path(order) %></p>
+                  <div class="column is-3">
+                    <p class="is-size-7 has-text-grey">Date</p>
+                    <p class="has-text-weight-semibold">
+                      <%= order.order_date.strftime("%b %d, %Y") %>
+                    </p>
+                  </div>
+
+                  <div class="column is-3">
+                    <p class="is-size-7 has-text-grey">Total</p>
+                    <p class="has-text-weight-semibold">
+                      <%= number_to_currency(order.total_price/100.0) %>
+                    </p>
+                  </div>
+
+                  <div class="column is-2">
+                    <p class="is-size-7 has-text-grey">Status</p>
+                    <p class="has-text-weight-semibold"><%= order.status %></p>
+                  </div>
+
+                  <div class="column is-2 has-text-right">
+                    <%= link_to "View Details", order_path(order),
+                          class: "button is-link is-light is-small" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</section>

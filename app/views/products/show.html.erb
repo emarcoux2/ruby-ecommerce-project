@@ -1,31 +1,72 @@
 <section class="section">
-  <div class="container">
-    <div class="columns is-vcentered">
+  <div class="container is-max-desktop">
+    <div class="columns is-variable is-6 is-vcentered">
       <div class="column is-half">
-        <%= render partial: "products/product", locals: { product: @product, show_name: false } %>
-        <h1 class="title is-2"><%= @product.name %></h1>
-        <p class="subtitle is-4 has-text-success">
+        <div class="card">
+          <div class="card-image">
+            <% if @product.image.attached? || @product.image_url.present? %>
+              <figure class="image">
+                <% if @product.image.attached? %>
+                  <%= image_tag url_for(@product.image), alt: @product.name %>
+                <% else %>
+                  <%= image_tag @product.image_url, alt: @product.name %>
+                <% end %>
+              </figure>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="column is-half">
+        <h1 class="title is-2 mb-2"><%= @product.name %></h1>
+        <p class="subtitle is-4 has-text-success mb-4">
           <%= number_to_currency(@product.price) %>
         </p>
-        <div class="content">
+        <%= form_with url: add_cart_path, method: :post, class: "mb-4" do %>
+          <%= hidden_field_tag :product_id, @product.id, id: nil %>
+
+          <div class="field is-grouped is-align-items-center mb-3">
+            <div class="control">
+              <%= number_field_tag :quantity, 1, min: 1,
+                    class: "input is-small",
+                    style: "width: 60px; text-align: center;",
+                    id: nil %>
+            </div>
+            <div class="control">
+              <%= button_tag "Add to Cart 💳",
+                    class: "button is-primary" %>
+            </div>
+          </div>
+        <% end %>
+        <div class="content mb-4">
           <p><%= @product.description %></p>
         </div>
-        <p class="is-size-6 has-text-grey">
-          <strong>Category:</strong> <%= @product.category&.name || "Uncategorized" %>
-        </p>
-        <p class="is-size-6 has-text-grey">
-          <strong>SKU:</strong> <%= @product.sku %>
-        </p>
-        <p class="is-size-6 has-text-grey">
-          <strong>Available:</strong> <%= @product.quantity %>
-        </p>
-        <p>
-          <strong>Unit:</strong> <%= @product.unit %>
-        </p>
+
+        <div class="columns is-multiline is-mobile">
+          <div class="column is-half">
+            <p class="is-size-6 has-text-grey">
+              <strong>Category:</strong> <%= @product.category&.name || "Uncategorized" %>
+            </p>
+          </div>
+          <div class="column is-half">
+            <p class="is-size-6 has-text-grey">
+              <strong>SKU:</strong> <%= @product.sku %>
+            </p>
+          </div>
+          <div class="column is-half">
+            <p class="is-size-6 has-text-grey">
+              <strong>Available:</strong> <%= @product.quantity %>
+            </p>
+          </div>
+          <div class="column is-half">
+            <p class="is-size-6 has-text-grey">
+              <strong>Unit:</strong> <%= @product.unit %>
+            </p>
+          </div>
+        </div>
+
         <div class="mt-5">
-          <a href="/" class="button is-link is-medium">
-            ← Back to Products
-          </a>
+          <%= link_to "← Back to Products", products_path, class: "button is-link is-medium" %>
         </div>
       </div>
     </div>
