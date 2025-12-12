@@ -1,5 +1,15 @@
-<h1><%= @page.title %></h1>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h1 class="title is-2 has-text-centered mb-5">
+      <%= @page.title %>
+    </h1>
 
-<div>
-  <%= @page.content.html_safe %>
-</div>
+    <div class="box content">
+      <%= simple_format(@page.content) %>
+    </div>
+
+    <div class="has-text-centered mt-5">
+      <%= link_to "Back to Home", root_path, class: "button is-link" %>
+    </div>
+  </div>
+</section>
